@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.

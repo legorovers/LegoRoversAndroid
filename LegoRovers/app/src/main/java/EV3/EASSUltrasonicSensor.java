@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.
@@ -85,5 +85,13 @@ public class EASSUltrasonicSensor implements EASSSensor {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
+	}
+
+	@Override
+	public float getSample()
+	{
+		float[] sample = new float[1];
+		sensor.fetchSample(sample, 1);
+		return sample[0];
 	}
 }

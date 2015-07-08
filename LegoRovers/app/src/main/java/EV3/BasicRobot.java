@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.
@@ -22,8 +22,8 @@ package lr_evolution;// --------------------------------------------------------
 //
 //----------------------------------------------------------------------------
 
-import java.util.ArrayList;
 
+import java.util.ArrayList;
 import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.remote.ev3.RemoteRequestPilot;
 
@@ -48,18 +48,17 @@ public class BasicRobot implements LegoRobot {
 	
 	/**
 	 * Construct the robot from a name and the Bluetooth address.
-	 * @param name
 	 * @param address
 	 */
 	public BasicRobot(String address) throws Exception {
-        try
-        {
-            brick = new RemoteRequestEV3(address);
-        }
-        catch (Exception e)
-        {
-            throw new Exception("Could not connect " + address);
-        }
+		try
+		{
+			brick = new RemoteRequestEV3(address);
+		}
+		catch (Exception e)
+		{
+			throw new Exception("Could not connect " + address);
+		}
 	}
 	
 	/*

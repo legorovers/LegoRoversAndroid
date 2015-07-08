@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.
@@ -42,6 +42,11 @@ public interface EASSSensor {
 	 * @param o
 	 */
 	public void setPrintStream(PrintStream o);
+
+	/**
+	 * Return a sample of the sensor
+	 */
+	public float getSample();
 	
 	/**
 	 * Close the sensor and perform clean up.

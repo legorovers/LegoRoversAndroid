@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.
@@ -32,19 +32,17 @@ import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.remote.ev3.RemoteRequestSampleProvider;
 
 /**
- * Encapsulation of an RGB Sensor to be used with an EASS EV3 environment.
+ * Encapsulation of an Red Light Sensor to be used with an EASS EV3 environment.
  * @author louiseadennis
  *
  */
-public class EASSRGBColorSensor implements EASSSensor {
-	PrintStream blueout;
-	PrintStream redout;
-	PrintStream greenout;
+public class EASSRedColorSensor implements EASSSensor {
+	PrintStream out;
 	RemoteRequestSampleProvider sensor;
 	
-	public EASSRGBColorSensor(RemoteRequestEV3 brick, String portName) throws Exception {// was Remote Exception
+	public EASSRedColorSensor(RemoteRequestEV3 brick, String portName) throws Exception { //was remote exception
 		try {
-			sensor = (RemoteRequestSampleProvider) brick.createSampleProvider(portName, "lejos.hardware.sensor.EV3ColorSensor", "RGB");
+			sensor = (RemoteRequestSampleProvider) brick.createSampleProvider(portName, "lejos.hardware.sensor.EV3ColorSensor", "Red");
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 		}
@@ -57,56 +55,28 @@ public class EASSRGBColorSensor implements EASSSensor {
 	@Override
 	public void addPercept(EASSEV3Environment env) {
 		try {
-			float[] sample = new float[3];
+			float[] sample = new float[1];
 			sensor.fetchSample(sample, 0);
-			float red = sample[0];
-			float green = sample[1];
-			float blue = sample[2];
-			if (redout != null) {
-				redout.println("red light level is " + red);
+			float colorvalue = sample[0];
+			System.out.println("light level is " + colorvalue);
+			if (out != null) {
+				out.println("light level is " + colorvalue);
 			}
-			Literal r = new Literal("red");
-			r.addTerm(new NumberTermImpl(red));
-			env.addUniquePercept("red", r);
-			if (greenout != null) {
-				greenout.println("green light level is " + green);
-			}
-			Literal g = new Literal("green");
-			g.addTerm(new NumberTermImpl(green));
-			env.addUniquePercept("green", g);
-			if (blueout != null) {
-				blueout.println("blue light level is " + blue);
-			}
-			Literal b = new Literal("blue");
-			b.addTerm(new NumberTermImpl(blue));
-			env.addUniquePercept("blue", b);
+			Literal color = new Literal("light");
+			color.addTerm(new NumberTermImpl(colorvalue));
+			env.addUniquePercept("light", color);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
 	}
 	
-	/**
-	 * Set the print stream for the blue light values;
-	 * @param s
+	/*
+	 * (non-Javadoc)
+	 * @see eass.mas.ev3.lr_evolution.EASSSensor#setPrintStream(java.io.PrintStream)
 	 */
-	public void setBluePrintStream(PrintStream s) {
-		blueout = s;
-	}
-	
-	/**
-	 * Set the print stream for the red light values.
-	 * @param s
-	 */
-	public void setRedPrintStream(PrintStream s) {
-		redout = s;
-	}
-	
-	/**
-	 * Set the print stream for the green light values.
-	 * @param s
-	 */
-	public void setGreenPrintStream(PrintStream s) {
-		greenout = s;
+	@Override
+	public void setPrintStream(PrintStream s) {
+		out = s;
 	}
 	
 	/*
@@ -122,14 +92,11 @@ public class EASSRGBColorSensor implements EASSSensor {
 		}
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * @see eass.mas.ev3.lr_evolution.EASSSensor#setPrintStream(java.io.PrintStream)
-	 */
 	@Override
-	public void setPrintStream(PrintStream o) {
-		setBluePrintStream(o);
-		setRedPrintStream(o);
-		setGreenPrintStream(o);
+	public float getSample()
+	{
+		float[] sample = new float[1];
+		sensor.fetchSample(sample, 1);
+		return sample[0];
 	}
 }

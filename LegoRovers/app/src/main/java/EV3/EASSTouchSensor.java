@@ -1,4 +1,4 @@
-package lr_evolution;// ----------------------------------------------------------------------------
+package EV3;// ----------------------------------------------------------------------------
 // Copyright (C) 2015 Strategic Facilities Technology Council 
 //
 // This file is part of the Engineering Autonomous Space Software (EASS) Library.
@@ -22,8 +22,10 @@ package lr_evolution;// --------------------------------------------------------
 //
 //----------------------------------------------------------------------------
 
+import ail.syntax.GBelief;
+import ail.syntax.Guard;
 import ail.syntax.Literal;
-import ail.syntax.NumberTermImpl;
+import ail.syntax.Unifier;
 
 import java.io.PrintStream;
 //import java.rmi.RemoteException;
@@ -32,20 +34,19 @@ import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.remote.ev3.RemoteRequestSampleProvider;
 
 /**
- * Encapsulation of an Red Light Sensor to be used with an EASS EV3 environment.
+ * Encapsulation of an Touch Sensor to be used with an EASS environment.
  * @author louiseadennis
  *
  */
-public class EASSRedColorSensor implements EASSSensor {
+public class EASSTouchSensor implements EASSSensor {
 	PrintStream out;
 	RemoteRequestSampleProvider sensor;
+	boolean bumped = false;
+	String agName;
 	
-	public EASSRedColorSensor(RemoteRequestEV3 brick, String portName) throws Exception { //was remote exception
-		try {
-			sensor = (RemoteRequestSampleProvider) brick.createSampleProvider(portName, "lejos.hardware.sensor.EV3ColorSensor", "Red");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-		}
+	public EASSTouchSensor(RemoteRequestEV3 brick, String portName, String agName) throws Exception {//was remote exception
+		sensor = (RemoteRequestSampleProvider) brick.createSampleProvider(portName, "lejos.hardware.sensor.EV3TouchSensor", "Touch");
+		this.agName = agName;
 	}
 	
 	/*
@@ -57,14 +58,20 @@ public class EASSRedColorSensor implements EASSSensor {
 		try {
 			float[] sample = new float[1];
 			sensor.fetchSample(sample, 0);
-			float colorvalue = sample[0];
-			System.out.println("light level is " + colorvalue);
-			if (out != null) {
-				out.println("light level is " + colorvalue);
+			float bump = sample[0];
+			if (bump > 0) {
+				if (!bumped && out != null) {
+					out.println("bumped");
+				}
+				env.addPercept(new Literal("bump"));
+				bumped = true;
+			} else {
+				bumped = false;
+				if (env.agentmap.get(agName).believesyn(new Guard(new GBelief(new Literal("bump"))), new Unifier())) {
+					env.removePercept(new Literal("bump"));
+					System.err.println("removing bump");
+				}
 			}
-			Literal color = new Literal("light");
-			color.addTerm(new NumberTermImpl(colorvalue));
-			env.addUniquePercept("light", color);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
@@ -90,5 +97,13 @@ public class EASSRedColorSensor implements EASSSensor {
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}
+	}
+
+	@Override
+	public float getSample()
+	{
+		float[] sample = new float[1];
+		sensor.fetchSample(sample, 1);
+		return sample[0];
 	}
 }

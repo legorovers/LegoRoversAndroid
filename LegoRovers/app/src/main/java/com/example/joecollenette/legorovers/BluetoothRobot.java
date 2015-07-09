@@ -2,41 +2,104 @@ package com.example.joecollenette.legorovers;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.widget.TextView;
-import android.os.Handler;
-
-import org.w3c.dom.Text;
+import android.graphics.PointF;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
-import java.util.Iterator;
-import java.util.Queue;
+import java.util.ArrayList;
 import java.util.Set;
-import java.util.Stack;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.LogRecord;
 
-import EV3.BasicRobot;
-import EV3.EASSEV3Environment;
-import EV3.EASSRGBColorSensor;
-import EV3.EASSSensor;
 
 /**
  * Created by joecollenette on 02/07/2015.
  */
 public class BluetoothRobot implements Runnable
 {
+
+	private static RobotActions[] a = RobotActions.values();
+
 	public enum RobotActions
 	{
-		FORWARD,
-		FORWARD_A_BIT,
-		STOP,
-		BACK_A_BIT,
-		BACKWORD,
-		LEFT,
-		RIGHT,
-		SCARE
+		NOTHING(0),
+		FORWARD(1),
+		FORWARD_A_BIT(2),
+		STOP(3),
+		BACK_A_BIT(4),
+		BACKWORD(5),
+		LEFT(6),
+		LEFT_A_BIT(7),
+		RIGHT(8),
+		RIGHT_A_BIT(9),
+		SCARE(10);
+
+		int value;
+		RobotActions(int i)
+		{
+			value = i;
+		}
+
+		public int toInt()
+		{
+			return value;
+		}
+
+		public static RobotActions fromInt(int i)
+		{
+			for (int j = 0; j < a.length; j++)
+			{
+				if (a[j].toInt() == i)
+				{
+					return a[j];
+				}
+			}
+			return NOTHING;
+		}
+	}
+
+	public class RobotRules
+	{
+		private boolean on;
+		private RobotActions[] actions;
+		private int onAppeared;
+
+		public RobotRules()
+		{
+			on = false;
+			onAppeared = 0;
+			actions = new RobotActions[]{RobotActions.NOTHING, RobotActions.NOTHING, RobotActions.NOTHING};
+		}
+
+		public void setEnabled(boolean enabled)
+		{
+			on = enabled;
+		}
+
+		public boolean getEnabled()
+		{
+			return on;
+		}
+
+		public void setOnAppeared(int appear)
+		{
+			onAppeared = appear;
+		}
+
+		public int getOnAppeared()
+		{
+			return onAppeared;
+		}
+
+		public void editAction(RobotActions action, int pos)
+		{
+			actions[pos] = action;
+		}
+
+		public RobotActions getAction(int pos)
+		{
+			return actions[pos];
+		}
 	}
 
     private BluetoothAdapter btAdapter;
@@ -47,11 +110,46 @@ public class BluetoothRobot implements Runnable
 	private boolean connected = false;
 	private ConcurrentLinkedQueue<RobotActions> actions;
 
-	private String distanceInput;
-	private StringBuilder colourInput;
+	private String distance = "Distance is -";
+	private String light = "Light is -";
+	private RobotRules[] rules;
 
-	private boolean doUpdates;
+	private boolean path;
+	private boolean water;
+	private boolean obstacle;
+	private StringBuilder beliefs = new StringBuilder();
 
+	private Float objectDetected = 0.4f;
+	private Float pathLight = 0.09f;
+	private PointF waterLightRange = new PointF(0.06f, 0.09f) ;
+
+	private void updateBeliefs(float distance, float light)
+	{
+		obstacle = distance < objectDetected;
+		path = light > pathLight;
+		water = light > waterLightRange.x && light < waterLightRange.y;
+
+		beliefs.setLength(0);
+		beliefs.append("Beliefs - [");
+		if (obstacle)
+		{
+			beliefs.append("Obstacle, ");
+		}
+		if (water)
+		{
+			beliefs.append("Water, ");
+		}
+		if (path)
+		{
+			beliefs.append("Path");
+		}
+
+		if (beliefs.toString().endsWith(", "))
+		{
+			beliefs.setLength(beliefs.length() - 2);
+		}
+		beliefs.append(']');
+	}
 
     @Override
     public void run()
@@ -62,36 +160,19 @@ public class BluetoothRobot implements Runnable
 			{
 				robot = new Robot(btAddress);
 				robot.connect();
-				colourInput = new StringBuilder();
-
 			}
 
 			connected = true;
-
-
-			robot.getRGBSensor().setPrintStream(new PrintStream(new OutputStream()
-			{
-				@Override
-				public void write(int oneByte) throws IOException
-				{
-					if (oneByte == '\n')
-					{
-						colourInput.setLength(0);
-					}
-					else
-					{
-						colourInput.append(oneByte);
-					}
-				}
-			}));
-
-
+			float disInput;
+			float lightInput;
 			while (connected)
 			{
-				if (doUpdates)
-				{
-					distanceInput = "Distance is " + robot.getuSensor().getSample();
-				}
+				disInput = robot.getuSensor().getSample();
+				lightInput = robot.getRGBSensor().getSample();
+				distance = "Distance is " + disInput;
+				light = "Light is " + disInput;
+
+				updateBeliefs(disInput, lightInput);
 
 				while(actions.peek() != null)
 				{
@@ -115,8 +196,14 @@ public class BluetoothRobot implements Runnable
 						case LEFT:
 							robot.left();
 							break;
+						case LEFT_A_BIT:
+							robot.short_left();
+							break;
 						case RIGHT:
 							robot.right();
+							break;
+						case RIGHT_A_BIT:
+							robot.short_right();
 							break;
 						case SCARE:
 							robot.scare();
@@ -142,12 +229,32 @@ public class BluetoothRobot implements Runnable
 	{
 		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		actions = new ConcurrentLinkedQueue<RobotActions>();
-		doUpdates = false;
+
+		rules = new RobotRules[]{
+				new RobotRules(),
+				new RobotRules(),
+				new RobotRules()
+		};
 	}
 
 	public void addAction(RobotActions action)
 	{
 		actions.add(action);
+	}
+
+	public void editRule(int pos, RobotRules rule)
+	{
+		rules[pos] = rule;
+	}
+
+	public RobotRules getRule(int pos)
+	{
+		return rules[pos];
+	}
+
+	public RobotRules[] getAllRules()
+	{
+		return rules;
 	}
 
     public Exception getGeneratedException()
@@ -188,14 +295,19 @@ public class BluetoothRobot implements Runnable
 		}
 	}
 
-	public void monitorValues(Boolean update)
+	public String getBeliefString()
 	{
-		doUpdates = update;
+		return beliefs.toString();
 	}
 
 	public String getDistance()
 	{
-		return distanceInput;
+		return distance;
+	}
+
+	public String getLight()
+	{
+		return light;
 	}
 
 	public String getMessages()

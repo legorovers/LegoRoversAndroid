@@ -5,71 +5,79 @@
               android:orientation="vertical"
               android:id="@+id/rules">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Colour Value - 0.0000000"
-            android:id="@+id/txtColour"
-            android:padding="10dp"
-            android:singleLine="true"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Distance Value - 0.0000000"
-            android:id="@+id/txtDistance"
-            android:padding="10dp"
-            android:singleLine="true"
-            />
-
-    </LinearLayout>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Colour Value - 0.0000000"
+        android:id="@+id/txtColour"
+        android:padding="10dp"
+        android:singleLine="true"/>
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Beliefs - "
-        android:id="@+id/textView8"
-        android:padding="10dp"/>
+        android:text="Distance Value - 0.0000000"
+        android:id="@+id/txtDistance"
+        android:padding="10dp"
+        android:singleLine="true"
+        />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Rules"
-        android:id="@+id/textView9"
-        android:singleLine="false"
-        android:padding="10dp"/>
+        android:text="Beliefs - [Water, Path, Obstacle]"
+        android:id="@+id/txtBeliefs"
+        android:padding="10dp"
+        android:singleLine="true"/>
 
-    <LinearLayout
-        android:orientation="horizontal"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
+        <Spinner
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/cboRule"
+            android:layout_gravity="center_horizontal"
+            android:entries="@array/rule_list"
+            android:layout_alignParentStart="true"
+            android:spinnerMode="dialog"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="is"
+            android:id="@+id/textView7"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/cboRule"
+            android:layout_marginStart="20dp"/>
 
         <Switch
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="On"
-            android:id="@+id/switch1"
-            android:layout_gravity="center_vertical"/>
+            android:id="@+id/swtRule"
+            android:layout_gravity="top|center"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@+id/textView7"/>
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:id="@+id/scrView">
 
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="right"
-            >
+            android:layout_height="wrap_content">
 
             <LinearLayout
                 android:orientation="horizontal"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
                 <TextView
@@ -77,15 +85,16 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="@string/rule"
-                    android:id="@+id/textView10"/>
+                    android:id="@+id/textView10"
+                    android:padding="10dp"/>
 
                 <Spinner
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/spinner4"
+                    android:id="@+id/cboObstacle"
                     android:layout_weight="1"
-                    android:entries="@array/rule_type_options"/>
-
+                    android:entries="@array/rule_type_options"
+                    android:spinnerMode="dialog"/>
             </LinearLayout>
 
             <LinearLayout
@@ -98,46 +107,67 @@
                     android:layout_height="wrap_content"
                     android:textAppearance="?android:attr/textAppearanceLarge"
                     android:text="@string/rule_cont"
-                    android:id="@+id/textView11"/>
+                    android:id="@+id/textView11"
+                    android:padding="10dp"/>
 
                 <Spinner
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/spinner"
+                    android:id="@+id/cboAction1"
                     android:layout_weight="1"
-                    android:transitionGroup="false"
-                    android:entries="@array/rule_options"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/rule_then"
-                    android:id="@+id/textView12"/>
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spinner2"
-                    android:layout_weight="1"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/rule_then"
-                    android:id="@+id/textView13"/>
-
-                <Spinner
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/spinner3"
-                    android:layout_weight="1"/>
+                    android:entries="@array/rule_options"
+                    android:spinnerMode="dialog"
+                    />
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/rule_then"
+                    android:id="@+id/textView12"
+                    android:padding="10dp"/>
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cboAction2"
+                    android:layout_weight="1"
+                    android:entries="@array/rule_options"
+                    android:spinnerMode="dialog"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/rule_then"
+                    android:id="@+id/textView13"
+                    android:padding="10dp"/>
+
+                <Spinner
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/cboAction3"
+                    android:layout_weight="1"
+                    android:entries="@array/rule_options"
+                    android:spinnerMode="dialog"
+                    android:longClickable="false"/>
+            </LinearLayout>
+
         </LinearLayout>
-
-    </LinearLayout>
-
+    </ScrollView>
 
 
 </LinearLayout>

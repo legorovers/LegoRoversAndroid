@@ -91,7 +91,7 @@ public class EASSUltrasonicSensor implements EASSSensor {
 	public float getSample()
 	{
 		float[] sample = new float[1];
-		sensor.fetchSample(sample, 1);
+		sensor.fetchSample(sample, 0);
 		return sample[0];
 	}
 }

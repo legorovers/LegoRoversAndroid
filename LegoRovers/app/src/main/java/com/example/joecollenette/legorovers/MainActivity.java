@@ -1,40 +1,36 @@
 package com.example.joecollenette.legorovers;
 
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothManager;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.res.Configuration;
-import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
-import android.support.v7.app.ActionBar;
+import android.app.ActionBar;
+import android.content.ClipData;
 import android.os.Bundle;
 import android.os.Handler;
-import android.view.DragEvent;
+import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import org.w3c.dom.Text;
+import Actions.ActionDragListener;
+import Actions.ButtonShadow;
+import Rules.RuleEvents;
 
 
-public class MainActivity extends ActionBarActivity
+public class MainActivity extends FragmentActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private boolean viewCreated = false;
     private BluetoothRobot btRobot;
 	private Thread robotThread;
-	private BluetoothManager btMan;
 	private Handler connectHandle;
 	private Handler dataHandle;
+	private RuleEvents rEvents;
 
 
     /**
@@ -54,6 +50,9 @@ public class MainActivity extends ActionBarActivity
 		public void run()
 		{
 			((TextView)findViewById(R.id.txtDistance)).setText(btRobot.getDistance());
+			((TextView)findViewById(R.id.txtColour)).setText(btRobot.getLight());
+			((TextView)findViewById(R.id.txtBeliefs)).setText(btRobot.getBeliefString());
+			connectHandle.postDelayed(dataUpdate, 100);
 		}
 	};
 
@@ -83,10 +82,15 @@ public class MainActivity extends ActionBarActivity
 			}
 			else
 			{
-				connectHandle.postDelayed(connectUpdate, 1000);
+				connectHandle.postDelayed(connectUpdate, 100);
 			}
 		}
 	};
+
+	public void swtRuleChanged(View view)
+	{
+
+	}
 
 	public void cmdActionClicked(View view)
 	{
@@ -111,6 +115,12 @@ public class MainActivity extends ActionBarActivity
 					break;
 				case R.id.cmdLeft:
 					btRobot.addAction(BluetoothRobot.RobotActions.LEFT);
+					break;
+				case R.id.cmdLeft_A_Bit:
+					btRobot.addAction(BluetoothRobot.RobotActions.LEFT_A_BIT);
+					break;
+				case R.id.cmdRight_A_Bit:
+					btRobot.addAction(BluetoothRobot.RobotActions.RIGHT_A_BIT);
 					break;
 				case R.id.cmdRight:
 					btRobot.addAction(BluetoothRobot.RobotActions.RIGHT);
@@ -142,10 +152,6 @@ public class MainActivity extends ActionBarActivity
 				robotThread = new Thread(btRobot);
 				robotThread.start();
 			}
-			findViewById(R.id.cmdConnect).setEnabled(false);
-			((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(0);
-			findViewById(R.id.drawer_layout).setEnabled(false);
-			connectHandle.post(connectUpdate);
 		}
 		else
 		{
@@ -158,32 +164,60 @@ public class MainActivity extends ActionBarActivity
 				btRobot.close();
 			}
 		}
+		findViewById(R.id.cmdConnect).setEnabled(false);
+		((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(0);
+		findViewById(R.id.drawer_layout).setEnabled(false);
+		connectHandle.post(connectUpdate);
 	}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+		btRobot = new BluetoothRobot();
 
 		connectHandle = new Handler();
+		dataHandle = new Handler();
         viewCreated = true;
         onNavigationDrawerItemSelected(0);
-
         mNavigationDrawerFragment = (NavigationDrawerFragment)
                 getSupportFragmentManager().findFragmentById(R.id.navigation_drawer);
         mTitle = getResources().getStringArray(R.array.menu_options)[0];
 
         // Set up the drawer.
         mNavigationDrawerFragment.setUp(
-                R.id.navigation_drawer,
-                (DrawerLayout) findViewById(R.id.drawer_layout));
-        btRobot = new BluetoothRobot();
-		btMan = (BluetoothManager)getSystemService(BLUETOOTH_SERVICE);
+				R.id.navigation_drawer,
+				(DrawerLayout) findViewById(R.id.drawer_layout));
+
+
 
 		if (savedInstanceState != null)
 		{
 			onNavigationDrawerItemSelected(savedInstanceState.getInt("curPos"));
 		}
+
+		rEvents = new RuleEvents((LinearLayout)findViewById(R.id.rules), btRobot.getAllRules());
+		((Spinner)findViewById(R.id.cboRule)).setOnItemSelectedListener(rEvents.new ruleChanged());
+		((Switch)findViewById(R.id.swtRule)).setOnCheckedChangeListener(rEvents.new swtChanged());
+		((Spinner)findViewById(R.id.cboObstacle)).setOnItemSelectedListener(rEvents.new obstacleChange());
+		((Spinner)findViewById(R.id.cboAction1)).setOnItemSelectedListener(rEvents.new actionChanged());
+		((Spinner)findViewById(R.id.cboAction2)).setOnItemSelectedListener(rEvents.new actionChanged());
+		((Spinner)findViewById(R.id.cboAction3)).setOnItemSelectedListener(rEvents.new actionChanged());
+
+
+		((ListView)findViewById(R.id.lstActions)).setOnDragListener(new ActionDragListener());
+		((Button)findViewById(R.id.cmdAFor_A_Bit)).setOnLongClickListener(new View.OnLongClickListener()
+		{
+			@Override
+			public boolean onLongClick(View view)
+			{
+				ClipData clipData = ClipData.newPlainText("Action", "FAB");
+				View.DragShadowBuilder shadow = new ButtonShadow(((Button) findViewById(R.id.cmdAFor_A_Bit)));
+
+				view.startDrag(clipData, shadow, BluetoothRobot.RobotActions.FORWARD_A_BIT, 0);
+				return true;
+			}
+		});
     }
 
 	@Override
@@ -208,14 +242,15 @@ public class MainActivity extends ActionBarActivity
 			findViewById(R.id.rules).setVisibility(LayoutManager.getVisibility(position, R.id.rules));
 			findViewById(R.id.settings).setVisibility(LayoutManager.getVisibility(position, R.id.settings));
 
-			btRobot.monitorValues(position == 1);
+			dataHandle.removeCallbacks(dataUpdate);
             switch (position)
             {
                 case 0:
+					LayoutManager.setUpManualView(this);
                     break;
 				case 1:
-					dataHandle.postDelayed(dataUpdate, 1000);
-					LayoutManager.setUpRulesView();
+					dataHandle.postDelayed(dataUpdate, 100);
+					LayoutManager.setUpRulesView(((LinearLayout)findViewById(R.id.rules)), btRobot.getAllRules());
 					break;
                 case 3:
                     LayoutManager.setUpSettingsView((LinearLayout) findViewById(R.id.settings),
@@ -226,7 +261,7 @@ public class MainActivity extends ActionBarActivity
     }
 
     public void restoreActionBar() {
-        ActionBar actionBar = getSupportActionBar();
+        ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
         actionBar.setDisplayShowTitleEnabled(true);
         actionBar.setTitle(mTitle);

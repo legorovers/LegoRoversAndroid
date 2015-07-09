@@ -137,8 +137,8 @@ public class EASSRGBColorSensor implements EASSSensor {
 	@Override
 	public float getSample()
 	{
-		float[] sample = new float[1];
-		sensor.fetchSample(sample, 1);
+		float[] sample = new float[3];
+		sensor.fetchSample(sample, 0);
 		return sample[0];
 	}
 }

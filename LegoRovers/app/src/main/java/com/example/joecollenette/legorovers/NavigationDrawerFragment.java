@@ -1,8 +1,7 @@
 package com.example.joecollenette.legorovers;
 
-import android.support.v7.app.ActionBarActivity;
+import android.app.ActionBar;
 import android.app.Activity;
-import android.support.v7.app.ActionBar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -20,7 +19,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.widget.Toast;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -258,7 +256,7 @@ public class NavigationDrawerFragment extends Fragment {
     }
 
     private ActionBar getActionBar() {
-        return ((ActionBarActivity) getActivity()).getSupportActionBar();
+        return getActivity().getActionBar();
     }
 
     /**

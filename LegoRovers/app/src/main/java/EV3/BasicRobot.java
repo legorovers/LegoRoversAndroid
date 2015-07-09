@@ -23,6 +23,8 @@ package EV3;// -----------------------------------------------------------------
 //----------------------------------------------------------------------------
 
 
+import android.os.SystemClock;
+
 import java.util.ArrayList;
 import lejos.remote.ev3.RemoteRequestEV3;
 import lejos.remote.ev3.RemoteRequestPilot;
@@ -177,7 +179,7 @@ public class BasicRobot implements LegoRobot {
 		}
 		
 		try {
-			wait(500);
+			SystemClock.sleep(500);
 		} catch (Exception e) {
 			System.err.println(e.getMessage());
 		}

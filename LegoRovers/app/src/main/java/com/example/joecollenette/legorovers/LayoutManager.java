@@ -1,33 +1,25 @@
 package com.example.joecollenette.legorovers;
 
-import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
-import android.content.Context;
+import android.app.Activity;
+import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.database.DataSetObserver;
-import android.os.Handler;
+import android.graphics.Point;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Set;
 
 /**
  * Created by joecollenette on 03/07/2015.
  */
 public final class LayoutManager
 {
-	private static PrintStream colourStream;
 	private static final int[] layout_position_id = new int[]{
 			R.id.rover,
 			R.id.rules,
@@ -52,9 +44,49 @@ public final class LayoutManager
 			return View.INVISIBLE;
 		}
 	}
-
-	public static void setUpRulesView()
+	
+	private static void setResizedParam(Button id, int size, Activity view)
 	{
+		TableRow.LayoutParams param = (TableRow.LayoutParams)(id).getLayoutParams();
+		param.height = size;
+		param.width = size;
+		id.setLayoutParams(param);
+	}
+
+	public static void setUpManualView(Activity manualView)
+	{
+		Configuration configuration = manualView.getResources().getConfiguration();
+		Point size = new Point();
+		manualView.getWindowManager().getDefaultDisplay().getSize(size);
+
+		int button_width = size.x / 5;
+		int button_height = size.y / 5;
+
+		int smallest = button_width < button_height ? button_width : button_height;
+		setResizedParam((Button)manualView.findViewById(R.id.cmdForward), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdFor_A_Bit), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdStop), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdBack_A_Bit), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdBack), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdLeft), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdLeft_A_Bit), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdRight_A_Bit), smallest, manualView);
+		setResizedParam((Button)manualView.findViewById(R.id.cmdRight), smallest, manualView);
+
+	}
+
+	public static void setUpRulesView(LinearLayout rulesView, BluetoothRobot.RobotRules[] rules)
+	{
+		int pos = ((Spinner)rulesView.findViewById(R.id.cboRule)).getSelectedItemPosition();
+
+		BluetoothRobot.RobotRules rule = rules[pos];
+
+		((Switch)rulesView.findViewById(R.id.swtRule)).setChecked(rule.getEnabled());
+		((Spinner)rulesView.findViewById(R.id.cboObstacle)).setSelection(rule.getOnAppeared());
+
+		((Spinner)rulesView.findViewById(R.id.cboAction1)).setSelection(rule.getAction(0).toInt());
+		((Spinner)rulesView.findViewById(R.id.cboAction2)).setSelection(rule.getAction(1).toInt());
+		((Spinner)rulesView.findViewById(R.id.cboAction3)).setSelection(rule.getAction(2).toInt());
 
 	}
 
@@ -71,13 +103,11 @@ public final class LayoutManager
 
 		if (connected)
 		{
-			((TextView) settingsView.findViewById(R.id.lblStatus)).setText("Connected");
 			((Button) settingsView.findViewById(R.id.cmdConnect)).setText("Disconnect");
 			((TextView) settingsView.findViewById(R.id.txtMessages)).setText("");
 		}
 		else
 		{
-			((TextView) settingsView.findViewById(R.id.lblStatus)).setText("Not Connected");
 			((Button) settingsView.findViewById(R.id.cmdConnect)).setText("Connect");
 			((TextView) settingsView.findViewById(R.id.txtMessages)).setText(resources.getString(R.string.connect_warning));
 		}

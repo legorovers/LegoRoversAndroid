@@ -1,6 +1,7 @@
 package com.example.joecollenette.legorovers;
 
 import android.os.AsyncTask;
+import android.os.SystemClock;
 
 import EV3.BasicRobot;
 import EV3.EASSRGBColorSensor;
@@ -124,19 +125,19 @@ public class Robot extends BasicRobot
                 motor.stop();
                 messages.append("   Closing Jaw Motor " + '\n');
                 motor.close();
-                //Thread.sleep(10);
+                SystemClock.sleep(10);
                 motorR.stop();
                 motorL.stop();
                 messages.append("   Closing Right Motor " + '\n');
                 motorR.close();
-                //Thread.sleep(10);
+                SystemClock.sleep(10);
                 messages.append("   Closing Left Motor " + '\n');
                 motorL.close();
-                //Thread.sleep(10);
+                SystemClock.sleep(10);
                 pilot.stop();
                 messages.append("   Closing Pilot " + '\n');
                 pilot.close();
-               // Thread.sleep(10);
+                SystemClock.sleep(10);
             } catch (Exception e) {
 
             }
@@ -292,8 +293,8 @@ public class Robot extends BasicRobot
         motorR.rotate(d);
     }
 
-    public EASSSensor getRGBSensor() {
-        return super.getSensor(color_port);
+    public EASSRGBColorSensor getRGBSensor() {
+        return cSensor;
     }
 
 	public EASSUltrasonicSensor getuSensor()

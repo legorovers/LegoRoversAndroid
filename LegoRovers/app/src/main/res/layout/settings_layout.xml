@@ -44,9 +44,9 @@
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/editText"
+            android:id="@+id/txtObs"
             android:text="0.4"
             android:singleLine="true"
             android:clickable="true"
@@ -72,9 +72,9 @@
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/editText2"
+            android:id="@+id/txtwLower"
             android:text="0.06"
             android:singleLine="true"
             android:clickable="true"
@@ -92,16 +92,15 @@
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/editText3"
+            android:id="@+id/txtwUpper"
             android:text="0.09"
             android:singleLine="true"
             android:clickable="true"
             android:textAlignment="center"
             android:gravity="center"
-            android:layout_weight="0.00"
-            android:phoneNumber="true"/>
+            android:layout_weight="0.00"/>
     </LinearLayout>
 
     <LinearLayout
@@ -113,15 +112,15 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Water Light"
+            android:text="Path Light"
             android:id="@+id/textView17"/>
 
         <EditText
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:inputType="number"
+            android:inputType="numberDecimal"
             android:ems="10"
-            android:id="@+id/editText4"
+            android:id="@+id/txtPath"
             android:text="0.06"
             android:singleLine="true"
             android:clickable="true"
@@ -135,7 +134,8 @@
         android:layout_height="wrap_content"
         android:text="Set"
         android:id="@+id/button4"
-        android:layout_gravity="center"/>
+        android:layout_gravity="center"
+        android:onClick="cmdSetDetection"/>
 
     <FrameLayout
         android:layout_width="match_parent"
@@ -273,7 +273,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:id="@+id/pgbStatus"
-        android:progress="0"/>
+        android:progress="0"
+        android:max="4"/>
 
     <TextView
         android:layout_width="match_parent"

@@ -26,6 +26,7 @@ public class MainActivity extends FragmentActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private boolean viewCreated = false;
+	private boolean doConnect = true;
     private BluetoothRobot btRobot;
 	private Thread robotThread;
 	private Handler connectHandle;
@@ -62,35 +63,36 @@ public class MainActivity extends FragmentActivity
 		public void run()
 		{
 			((TextView)findViewById(R.id.txtMessages)).setText(btRobot.getMessages());
-			((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(btRobot.getPercentConnected() * 100);
+			((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(btRobot.getStepNo());
 
-			if (btRobot.getPercentConnected() == 1 || btRobot.getGeneratedException() != null)
+			if (btRobot.getGeneratedException() != null)
 			{
+				((TextView)findViewById(R.id.txtMessages)).append('\n' + btRobot.getGeneratedException().getMessage());
 				findViewById(R.id.cmdConnect).setEnabled(true);
 				findViewById(R.id.drawer_layout).setEnabled(true);
-				if (btRobot.getGeneratedException() != null)
-				{
-					((TextView)findViewById(R.id.txtMessages)).append('\n' + btRobot.getGeneratedException().getMessage());
-					((Button)findViewById(R.id.cmdConnect)).setText("Connect");
-				}
-				else
-				{
-					((TextView)findViewById(R.id.txtMessages)).append("\nConnected");
-					((Button)findViewById(R.id.cmdConnect)).setText("Disconnect");
-				}
+			}
+			if (btRobot.isConnected() && doConnect)
+			{
+				((TextView)findViewById(R.id.txtMessages)).append("\nConnected");
+				((Button)findViewById(R.id.cmdConnect)).setText("Disconnect");
+				findViewById(R.id.cmdConnect).setEnabled(true);
+				findViewById(R.id.drawer_layout).setEnabled(true);
 				connectHandle.removeCallbacks(connectUpdate);
 			}
-			else
+			else if (!btRobot.isConnected() && !doConnect)
+			{
+				((TextView)findViewById(R.id.txtMessages)).append("\nDisconnected");
+				((Button)findViewById(R.id.cmdConnect)).setText("Connect");
+				findViewById(R.id.cmdConnect).setEnabled(true);
+				findViewById(R.id.drawer_layout).setEnabled(true);
+				connectHandle.removeCallbacks(connectUpdate);
+			}
+			else if (btRobot.getGeneratedException() == null)
 			{
 				connectHandle.postDelayed(connectUpdate, 100);
 			}
 		}
 	};
-
-	public void swtRuleChanged(View view)
-	{
-
-	}
 
 	public void cmdActionClicked(View view)
 	{
@@ -132,6 +134,17 @@ public class MainActivity extends FragmentActivity
 		}
 	}
 
+	public void cmdSetDetection(View view)
+	{
+
+		btRobot.changeSettings(
+				Float.parseFloat(((TextView)findViewById(R.id.txtObs)).getText().toString()),
+				Float.parseFloat(((TextView) findViewById(R.id.txtwLower)).getText().toString()),
+				Float.parseFloat(((TextView)findViewById(R.id.txtwUpper)).getText().toString()),
+				Float.parseFloat(((TextView)findViewById(R.id.txtPath)).getText().toString())
+		);
+	}
+
 	public void cmdConnectClicked(View view)
 	{
 		if (!btRobot.isConnected())
@@ -148,21 +161,17 @@ public class MainActivity extends FragmentActivity
 			}
 			else
 			{
-				btRobot.close();
+				if (btRobot.isConnected())
+				{
+					btRobot.close();
+				}
 				robotThread = new Thread(btRobot);
 				robotThread.start();
 			}
 		}
 		else
 		{
-			if (robotThread != null)
-			{
-				btRobot.disconnect();
-			}
-			else
-			{
-				btRobot.close();
-			}
+			btRobot.disconnect();
 		}
 		findViewById(R.id.cmdConnect).setEnabled(false);
 		((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(0);

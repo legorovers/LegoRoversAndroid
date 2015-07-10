@@ -42,6 +42,7 @@ public class BasicRobot implements LegoRobot {
 	RemoteRequestPilot pilot;
 	boolean haspilot = false;
 	protected boolean disconnected = false;
+	boolean connected = false;
 	
 	EASSSensor sensor1;
 	EASSSensor sensor2;
@@ -50,12 +51,12 @@ public class BasicRobot implements LegoRobot {
 	
 	/**
 	 * Construct the robot from a name and the Bluetooth address.
-	 * @param address
 	 */
-	public BasicRobot(String address) throws Exception {
+	public void connect(String address)throws Exception {
 		try
 		{
 			brick = new RemoteRequestEV3(address);
+			connected = true;
 		}
 		catch (Exception e)
 		{
@@ -186,6 +187,12 @@ public class BasicRobot implements LegoRobot {
 		
 		System.err.println("   Disconnecting Brick");
 		brick.disConnect();
+		connected = false;
+	}
+
+	public boolean isConnected()
+	{
+		return connected;
 	}
 		
 

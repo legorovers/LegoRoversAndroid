@@ -23,8 +23,7 @@ public class Robot extends BasicRobot
 	EASSRGBColorSensor cSensor;
 
     private StringBuilder messages;
-	private int percentConnected;
-	private int noOfSteps = 4;
+	private int stepNo;
 
     private boolean closed = false;
     private boolean straight = false;
@@ -36,21 +35,21 @@ public class Robot extends BasicRobot
     int fast_turn = 80;
     int travel_speed = 10;
 
-	private void updateConnectedPercent(int i)
+	private void updateSetNo(int i)
 	{
-		percentConnected = i / noOfSteps;
+		stepNo = i;
 	}
 
-    public Robot(String address) throws Exception
+    public Robot() throws Exception
     {
-        super(address);
-		percentConnected = 0;
+		stepNo = 0;
 		messages = new StringBuilder();
 
     }
 
-    public void connect() throws Exception
+    public void connectToRobot(String address) throws Exception
     {
+        connect(address);
         RemoteRequestEV3 brick = getBrick();
 
 
@@ -62,10 +61,10 @@ public class Robot extends BasicRobot
             uSensor = new EASSUltrasonicSensor(brick, ultra_portstring);
             messages.append("Connected to Sensor " + '\n');
             setSensor(ultra_port, uSensor);
-            updateConnectedPercent(1);
+            stepNo++;
         } catch (Exception e) {
             brick.disConnect();
-            updateConnectedPercent(0);
+            stepNo++;
             throw e;
         }
 
@@ -74,12 +73,12 @@ public class Robot extends BasicRobot
             messages.append("Connecting to Colour Sensor " + '\n');
             cSensor = new EASSRGBColorSensor(brick, color_portstring);
             messages.append("Connected to Sensor " + '\n');
-            updateConnectedPercent(2);
+            stepNo++;
             setSensor(color_port, cSensor);
         } catch (Exception e) {
             uSensor.close();
             brick.disConnect();
-            updateConnectedPercent(0);
+            stepNo++;
             throw e;
         }
 
@@ -92,12 +91,12 @@ public class Robot extends BasicRobot
             motorL.setSpeed(200);
             pilot = (RemoteRequestPilot) brick.createPilot(7, 20, "C", "B " + '\n');
             messages.append("Created Pilot " + '\n');
-            updateConnectedPercent(3);
+            stepNo++;
         } catch (Exception e) {
             uSensor.close();
             cSensor.close();
             brick.disConnect();
-            updateConnectedPercent(0);
+            stepNo++;
             throw e;
         }
 
@@ -105,14 +104,14 @@ public class Robot extends BasicRobot
             messages.append("Contacting Medium Motor " + '\n');
             motor = (RemoteRequestRegulatedMotor) brick.createRegulatedMotor("A", 'M');
             messages.append("Created Medium Motor " + '\n');
-            updateConnectedPercent(4);
+            stepNo++;
         } catch (Exception e) {
             //uSensor.close();
             //cSensor.close();
             motorR.close();
             motorL.close();
             brick.disConnect();
-            updateConnectedPercent(0);
+            stepNo++;
             throw e;
         }
     }
@@ -307,8 +306,8 @@ public class Robot extends BasicRobot
 		return messages.toString();
 	}
 
-	public int getPercentConnected()
+	public int getStepNo()
 	{
-		return percentConnected;
+		return stepNo;
 	}
 }

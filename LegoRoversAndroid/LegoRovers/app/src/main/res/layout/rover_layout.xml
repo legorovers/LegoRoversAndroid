@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:id="@+id/rover"
+            android:columnCount="5"
+            android:rowCount="5"
+            android:alignmentMode="alignBounds">
+
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25B2\n\u25B2"
+        android:id="@+id/cmdForward"
+        android:layout_row="0"
+        android:layout_column="2"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="Scare"
+        android:id="@+id/cmdScare"
+        android:layout_row="1"
+        android:layout_column="0"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25B2"
+        android:id="@+id/cmdFor_A_Bit"
+        android:layout_row="1"
+        android:layout_column="2"
+        android:nestedScrollingEnabled="false"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="Stop"
+        android:id="@+id/cmdStop"
+        android:layout_row="2"
+        android:layout_column="2"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25BC"
+        android:id="@+id/cmdBack_A_Bit"
+        android:layout_row="3"
+        android:layout_column="2"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25BC\n\u25BC"
+        android:id="@+id/cmdBack"
+        android:layout_row="4"
+        android:layout_column="2"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25C0"
+        android:id="@+id/cmdLeft"
+        android:layout_row="2"
+        android:layout_column="0"
+        android:onClick="cmdActionClicked"/>
+
+    <Button
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:text="\u25B6"
+        android:id="@+id/cmdRight"
+        android:layout_row="2"
+        android:layout_column="3"
+        android:onClick="cmdActionClicked"/>
+
+
+</GridLayout>

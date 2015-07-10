@@ -56,7 +56,7 @@ public interface LegoRobot {
 	 * @param env
 	 */
 	public void addPercepts(EASSEV3Environment env);
-	
+
 	/**
 	 * Close sockets and clean up.
 	 */

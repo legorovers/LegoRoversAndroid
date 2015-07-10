@@ -95,7 +95,8 @@ public class EASSEV3Environment extends DefaultEASSEnvironment {
 	 */
 	public LegoRobot createRobot(String agent) throws Exception {
 		try {
-			BasicRobot robot = new BasicRobot(defaultaddress);
+			BasicRobot robot = new BasicRobot();
+			robot.connect(defaultaddress);
 			return robot;
 		} catch (Exception e) {
 			System.err.println(e.getMessage());

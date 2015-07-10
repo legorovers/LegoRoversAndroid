@@ -1,8 +1,0 @@
-User Manual
-
--Prerequisites 
-One ev3 robot in dinosaur setup
-One android 4.4 (KitKat) device with bluetooth
-
--Pairing the device with the ev3
-Switch on the ev3 robot with the middle darker grey button.

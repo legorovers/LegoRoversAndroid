@@ -5,3 +5,8 @@
 .DS_Store
 /build
 /captures
+/tex/UserManual.pdf
+/tex/UserManual.log
+/tex/UserManual.aux
+/tex/UserManual.synctex.gz
+/tex/.DS_Store

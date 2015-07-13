@@ -1,14 +1,15 @@
 \documentclass[]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
-
+\usepackage[utf8]{inputenc}
 
 \title{Android Lego Rovers\\User Manual}		
 \date{}			
 
 \begin{document}
 
+
 \maketitle
 \renewcommand\abstractname{}
-\abstract{What this document is for, standard android and samsung}
+\abstract{This is the user manual for the lego rovers android project, in this manual we have used a samsung galaxy tab 3 with android kitkat 4.4 for the examples in the manual. This app will work on any android device with 4.4 (KitKat) or higher, though the procedure to connect will be the same the look of the menus may be different.}
 
 \section{Prerequisites}
 \par{To use this manual you will need the following items:
@@ -43,7 +44,7 @@
 \begin{enumerate}
 	\item Start the Lego Rovers app
 	\item Go to settings with the Lego Rovers app
-	\item Touch the connect button
+	\item Press the connect button
 	\item Wait for the connected message to appear beneath the button. 
 \end{enumerate}
 
@@ -56,8 +57,56 @@
 \subsection{Navigating Screens}
 \par{To select a screen to use first touch the menu item on the top left of the screen. A list of pages will appear, touch the page name to go to that page}
 \subsection{Manual Control}
-\par{}
-\subsection{Rules}
-\subsection{Settings}
+\par{This screen has a number of buttons that can be pressed to control the robot, when connected the buttons do the following: 
+\begin{description}
+	\item[Double Up Arrow] Make the robot move forward until stop is pressed
+	\item[Up Arrow] Makes the robot move forward a short distance
+	\item[Stop] Stops the robot moving
+	\item[Down Arrow] Makes the robot go backwards a short distance
+	\item[Double Down Arrow] Makes the robot go backwards until the stop is pressed
+	\item[Double Left Arrow] Makes the robot turn left until stop is pressed
+	\item[Left Arrow] Makes the robot turn left, about 90 degrees
+	\item[Right Arrow] Makes the robot turn right, about 90 degrees
+	\item[Double Right Arrow] Makes the robot turn right until stop is pressed
+	\item[Scare] Makes the ``Jaws" of the robot open and close twice
+\end{description}
+}
 
+\subsection{Rules}
+\par{The rules section allows you to create rules that the robot will do, when either faced with an object or an object has disappeared. This is split into two sections with the top being the current values of the sensors and the bottom being where you can create and edit the rules of the robot.}
+\par{The top section consists of the following:
+\begin{description}
+\item[Light]This is the light sensor values, which returns the numerical value of the colour
+\item[Distance]This is the distance an object is from the front of the robot.
+\item[Beliefs]This is a list of what the robot believes to be true. Water being that the light sensor is picking up a blue colour, Path being that the light sensor is picking up a black colour and Obstacle being that an object is close to the front of the robot.
+\end{description}
+}
+
+\par{The second section is for creating rules which the robot will do when either faced with an object or when the object has been moved out of the way of the robot. You can select a rule to change from the dropdown menu. The options for the rules include:
+\begin{description}
+	\item[On/Off Switch] This turns the rule on or off for the robot
+	\item[Obstacle Choice] This dropdown menu lets you choose when the robot should react, either when an object has appeared or disappeared
+	\item[Choice of Actions] There are a further three dropdown menus which allow you to choose what the robot should do in the event that the obstacle has appeared/disappeared
+\end{description}
+}
+
+\subsection{Settings}
+\par{This page is for connecting and disconnecting the application from the robot, you can also change the detection settings for the water, path and obstacle detection.}
+
+\par{The detection settings at the top consist of:
+\begin{description}
+	\item[Obstacle Distance] This is the distance and which an obstacle is detected in front of the robot, the obstacle is detected between 0 and the value specified. The default is 0.4.
+	\item[Water Values] This is the light values which detect when there is blue beneath the light sensor. The detection happens when the value fall between the values specified with the lower value on the left and the larger value on the right. The default values are 0.06 to 0.09.
+	\item[Path Value] This is when the robot detects black beneath the light sensor indicating a path. The path is detected between the values of 0 to the value specified. The default is 0.06.
+\end{description}
+}
+
+\par{The robot connection settings consist of:
+\begin{description}
+	\item[Robot Address]This is the address of the robot to be connected to, the value can be found on the robot when it is turned on. The default value is 10.0.1.1.
+	\item[Connect/Disconnect] 
+	\par{This button connects and disconnects the robot depending if there is a connection. The connection and disconnection process takes a few moments and when the process is happening it is described in the box below the button.}
+	\par{When using the app be sure to turn off WiFi and mobile data, as this does cause the app to be unable to connect to the robot.}
+\end{description}
+}
 \end{document}  

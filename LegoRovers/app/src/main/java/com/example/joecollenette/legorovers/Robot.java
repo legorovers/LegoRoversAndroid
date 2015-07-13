@@ -40,7 +40,7 @@ public class Robot extends BasicRobot
 		stepNo = i;
 	}
 
-    public Robot() throws Exception
+    public Robot()
     {
 		stepNo = 0;
 		messages = new StringBuilder();
@@ -49,7 +49,10 @@ public class Robot extends BasicRobot
 
     public void connectToRobot(String address) throws Exception
     {
+		messages.setLength(0);
+
         connect(address);
+		closed = false;
         RemoteRequestEV3 brick = getBrick();
 
 
@@ -118,20 +121,27 @@ public class Robot extends BasicRobot
 
     public void close() {
 		messages.setLength(0);
+        updateSetNo(0);
         if (! closed) {
             super.disconnected = true;
             try {
                 motor.stop();
-                messages.append("   Closing Jaw Motor " + '\n');
-                motor.close();
+				messages.append("   Closing Jaw Motor " + '\n');
+				motor.close();
+
+				stepNo++;
                 SystemClock.sleep(10);
-                motorR.stop();
-                motorL.stop();
-                messages.append("   Closing Right Motor " + '\n');
-                motorR.close();
+				motorR.stop();
+				motorL.stop();
+				messages.append("   Closing Right Motor " + '\n');
+				motorR.close();
+
+				stepNo++;
                 SystemClock.sleep(10);
-                messages.append("   Closing Left Motor " + '\n');
-                motorL.close();
+				messages.append("   Closing Left Motor " + '\n');
+				motorL.close();
+
+				stepNo++;
                 SystemClock.sleep(10);
                 pilot.stop();
                 messages.append("   Closing Pilot " + '\n');
@@ -141,7 +151,8 @@ public class Robot extends BasicRobot
 
             }
             messages.append("   Closing Remaining Sensors" + '\n');
-            super.close();
+			super.close();
+			stepNo++;
         }
         closed = true;
     }

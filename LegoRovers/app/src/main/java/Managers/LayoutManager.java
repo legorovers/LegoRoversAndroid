@@ -1,6 +1,7 @@
-package com.example.joecollenette.legorovers;
+package Managers;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -13,6 +14,9 @@ import android.widget.Switch;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.example.joecollenette.legorovers.BluetoothRobot;
+import com.example.joecollenette.legorovers.R;
+
 import java.io.PrintStream;
 
 /**
@@ -23,7 +27,6 @@ public final class LayoutManager
 	private static final int[] layout_position_id = new int[]{
 			R.id.rover,
 			R.id.rules,
-			R.id.action,
 			R.id.settings
 	};
 
@@ -90,15 +93,12 @@ public final class LayoutManager
 
 	}
 
-	public static void setUpSettingsView(LinearLayout settingsView, boolean connected, Resources resources)
+	public static void setUpSettingsView(LinearLayout settingsView, boolean connected, Resources resources, SharedPreferences prefs)
 	{
-		//btRobot.stopValueWatch();
-
-		String[] btAddress = resources.getStringArray(R.array.bluetooth_address);
-		((TextView)settingsView.findViewById(R.id.txtBT1)).setText(btAddress[0]);
-		((TextView)settingsView.findViewById(R.id.txtBT2)).setText(btAddress[1]);
-		((TextView)settingsView.findViewById(R.id.txtBT3)).setText(btAddress[2]);
-		((TextView)settingsView.findViewById(R.id.txtBT4)).setText(btAddress[3]);
+		((TextView)settingsView.findViewById(R.id.txtBT1)).setText(String.valueOf(prefs.getInt("BT1", 10)));
+		((TextView)settingsView.findViewById(R.id.txtBT2)).setText(String.valueOf(prefs.getInt("BT2", 0)));
+		((TextView)settingsView.findViewById(R.id.txtBT3)).setText(String.valueOf(prefs.getInt("BT3", 1)));
+		((TextView)settingsView.findViewById(R.id.txtBT4)).setText(String.valueOf(prefs.getInt("BT4", 1)));
 
 
 		if (connected)

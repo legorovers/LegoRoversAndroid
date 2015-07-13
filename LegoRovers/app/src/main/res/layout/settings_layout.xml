@@ -205,15 +205,13 @@
 
         <EditText
             android:layout_width="70dp"
-            android:layout_height="fill_parent"
+            android:layout_height="wrap_content"
             android:inputType="number"
             android:ems="10"
-            android:id="@+id/txtBT3"
+            android:id="@+id/txtBT2"
             android:layout_weight="0.05"
-            android:text="1"
+            android:text="0"
             android:textSize="25dp"
-            android:textAlignment="center"
-            android:layout_gravity="top|center"
             android:gravity="center"
             android:maxLength="3"/>
 
@@ -228,13 +226,14 @@
 
         <EditText
             android:layout_width="70dp"
-            android:layout_height="wrap_content"
+            android:layout_height="fill_parent"
             android:inputType="number"
             android:ems="10"
-            android:id="@+id/txtBT2"
+            android:id="@+id/txtBT3"
             android:layout_weight="0.05"
-            android:text="0"
+            android:text="1"
             android:textSize="25dp"
+            android:textAlignment="center"
             android:gravity="center"
             android:maxLength="3"/>
 

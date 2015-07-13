@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import java.util.Collection;
 import java.util.Iterator;
@@ -16,8 +17,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class BluetoothRobot implements Runnable
 {
-
-	private static RobotActions[] a = RobotActions.values();
+	public enum ConnectStatus {CONNECTED, DISCONNECTED, CONNECTING, DISCONNECTING};
 
 	public enum RobotActions
 	{
@@ -56,6 +56,8 @@ public class BluetoothRobot implements Runnable
 			return NOTHING;
 		}
 	}
+
+	private static RobotActions[] a = RobotActions.values();
 
 	public class RobotRules
 	{
@@ -101,13 +103,11 @@ public class BluetoothRobot implements Runnable
 		}
 	}
 
-    private BluetoothAdapter btAdapter;
-	private BluetoothDevice robotDevice;
     private Robot robot;
     private Exception generatedException;
 	private String btAddress;
-	private boolean connected = false;
 	private LinkedBlockingDeque<RobotActions> actions;
+	private ConnectStatus status = ConnectStatus.DISCONNECTED;
 
 	private String distance = "Distance is -";
 	private String light = "Light is -";
@@ -121,12 +121,13 @@ public class BluetoothRobot implements Runnable
 
 	private float objectDetected = 0.4f;
 	private float pathLight = 0.09f;
-	private PointF waterLightRange = new PointF(0.06f, 0.09f) ;
+	private PointF waterLightRange = new PointF(0.06f, 0.09f);
 
 	private void updateBeliefs(float distance, float light)
 	{
-		obstacleChanged = obstacle == (distance < objectDetected);
+		obstacleChanged = obstacle != (distance < objectDetected);
 		obstacle = Float.compare(distance, objectDetected) < 0;
+
 		path = Float.compare(light, pathLight) > 0;
 		water = (Float.compare(light, waterLightRange.x) > 0) && (Float.compare(light, waterLightRange.y) < 0);
 
@@ -167,8 +168,8 @@ public class BluetoothRobot implements Runnable
 						break;
 					case 1:
 						doActions = obstacleChanged && !obstacle;
+						break;
 				}
-
 				if (doActions)
 				{
 					for (int j = rule.actions.length - 1; j >= 0; j--)
@@ -185,25 +186,17 @@ public class BluetoothRobot implements Runnable
     {
         try
         {
-            if (robot == null)
-			{
-				robot = new Robot();
-				robot.connectToRobot(btAddress);
-			}
-			else
-			{
-				robot.connectToRobot(btAddress);
-			}
-
-			connected = true;
+			status = ConnectStatus.CONNECTING;
+			robot.connectToRobot(btAddress);
+			status = ConnectStatus.CONNECTED;
 			float disInput;
 			float lightInput;
-			while (connected)
+			while (status == ConnectStatus.CONNECTED)
 			{
 				disInput = robot.getuSensor().getSample();
 				lightInput = robot.getRGBSensor().getSample();
 				distance = "Distance is " + disInput;
-				light = "Light is " + disInput;
+				light = "Light is " + lightInput;
 
 				updateBeliefs(disInput, lightInput);
 				checkRules();
@@ -247,21 +240,23 @@ public class BluetoothRobot implements Runnable
 			}
 
 			robot.close();
+			status = ConnectStatus.DISCONNECTED;
 
         }
         catch (Exception e)
         {
+			status = ConnectStatus.DISCONNECTING;
 			if (robot != null && robot.isConnected())
 			{
 				robot.close();
 			}
+			status = ConnectStatus.DISCONNECTED;
             generatedException = e;
         }
     }
 
 	public BluetoothRobot()
 	{
-		btAdapter = BluetoothAdapter.getDefaultAdapter();
 		actions = new LinkedBlockingDeque<RobotActions>();
 
 		rules = new RobotRules[]{
@@ -271,21 +266,12 @@ public class BluetoothRobot implements Runnable
 		};
 
 		beliefs = new StringBuilder("Beliefs - []");
+		robot = new Robot();
 	}
 
 	public void addAction(RobotActions action)
 	{
 		actions.add(action);
-	}
-
-	public void editRule(int pos, RobotRules rule)
-	{
-		rules[pos] = rule;
-	}
-
-	public RobotRules getRule(int pos)
-	{
-		return rules[pos];
 	}
 
 	public RobotRules[] getAllRules()
@@ -298,29 +284,19 @@ public class BluetoothRobot implements Runnable
         return generatedException;
     }
 
-    public Set<BluetoothDevice> getPairedDevices()
-    {
-        return btAdapter.getBondedDevices();
-    }
-
 	public void setBTAddress(String address)
 	{
 		btAddress = address;
 	}
 
-	public BluetoothAdapter getBluetoothAdapter()
+	public ConnectStatus connectionStatus()
 	{
-		return btAdapter;
-	}
-
-	public boolean isConnected()
-	{
-		return connected;
+		return status;
 	}
 
 	public void disconnect()
 	{
-		connected = false;
+		status = ConnectStatus.DISCONNECTING;
 	}
 
 	public void close()

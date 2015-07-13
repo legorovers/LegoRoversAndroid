@@ -11,8 +11,6 @@
          space available using match_parent in both dimensions. -->
     <include layout="@layout/rover_layout"/>
 
-    <include layout="@layout/action_layout"/>
-
     <include layout="@layout/rules_layout"/>
     <!--Settings Layout -->
     <include layout="@layout/settings_layout"/>

@@ -1,9 +1,13 @@
 package com.example.joecollenette.legorovers;
 
 import android.app.ActionBar;
-import android.content.ClipData;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,27 +15,26 @@ import android.view.View;
 import android.support.v4.widget.DrawerLayout;
 import android.widget.Button;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import Actions.ActionDragListener;
-import Actions.ButtonShadow;
-import Rules.RuleEvents;
+import Managers.EventManager;
+import Managers.LayoutManager;
 
 
 public class MainActivity extends FragmentActivity
         implements NavigationDrawerFragment.NavigationDrawerCallbacks {
 
     private boolean viewCreated = false;
-	private boolean doConnect = true;
     private BluetoothRobot btRobot;
 	private Thread robotThread;
 	private Handler connectHandle;
+	private Handler disconnectHandle;
 	private Handler dataHandle;
-	private RuleEvents rEvents;
+	private EventManager rEvents;
+	private SharedPreferences prefs;
 
 
     /**
@@ -57,6 +60,36 @@ public class MainActivity extends FragmentActivity
 		}
 	};
 
+	private Runnable disconnectUpdate = new Runnable()
+	{
+		@Override
+		public void run()
+		{
+			((TextView)findViewById(R.id.txtMessages)).setText(btRobot.getMessages());
+			((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(btRobot.getStepNo());
+
+			if (btRobot.getGeneratedException() != null)
+			{
+				((TextView)findViewById(R.id.txtMessages)).append('\n' + btRobot.getGeneratedException().getMessage());
+				findViewById(R.id.cmdConnect).setEnabled(true);
+				findViewById(R.id.drawer_layout).setEnabled(true);
+				disconnectHandle.removeCallbacks(disconnectUpdate);
+			}
+			else if (btRobot.connectionStatus() == BluetoothRobot.ConnectStatus.DISCONNECTED)
+			{
+				((TextView)findViewById(R.id.txtMessages)).append("\nDisconnected");
+				((Button)findViewById(R.id.cmdConnect)).setText("Connect");
+				findViewById(R.id.cmdConnect).setEnabled(true);
+				findViewById(R.id.drawer_layout).setEnabled(true);
+				disconnectHandle.removeCallbacks(disconnectUpdate);
+			}
+			else
+			{
+				disconnectHandle.postDelayed(disconnectUpdate, 100);
+			}
+		}
+	};
+
 	private Runnable connectUpdate = new Runnable()
 	{
 		@Override
@@ -70,8 +103,9 @@ public class MainActivity extends FragmentActivity
 				((TextView)findViewById(R.id.txtMessages)).append('\n' + btRobot.getGeneratedException().getMessage());
 				findViewById(R.id.cmdConnect).setEnabled(true);
 				findViewById(R.id.drawer_layout).setEnabled(true);
+				connectHandle.removeCallbacks(connectUpdate);
 			}
-			if (btRobot.isConnected() && doConnect)
+			else if (btRobot.connectionStatus() == BluetoothRobot.ConnectStatus.CONNECTED)
 			{
 				((TextView)findViewById(R.id.txtMessages)).append("\nConnected");
 				((Button)findViewById(R.id.cmdConnect)).setText("Disconnect");
@@ -79,15 +113,7 @@ public class MainActivity extends FragmentActivity
 				findViewById(R.id.drawer_layout).setEnabled(true);
 				connectHandle.removeCallbacks(connectUpdate);
 			}
-			else if (!btRobot.isConnected() && !doConnect)
-			{
-				((TextView)findViewById(R.id.txtMessages)).append("\nDisconnected");
-				((Button)findViewById(R.id.cmdConnect)).setText("Connect");
-				findViewById(R.id.cmdConnect).setEnabled(true);
-				findViewById(R.id.drawer_layout).setEnabled(true);
-				connectHandle.removeCallbacks(connectUpdate);
-			}
-			else if (btRobot.getGeneratedException() == null)
+			else
 			{
 				connectHandle.postDelayed(connectUpdate, 100);
 			}
@@ -96,7 +122,7 @@ public class MainActivity extends FragmentActivity
 
 	public void cmdActionClicked(View view)
 	{
-		if (btRobot.isConnected())
+		if (btRobot.connectionStatus() == BluetoothRobot.ConnectStatus.CONNECTED)
 		{
 			switch (view.getId())
 			{
@@ -147,36 +173,28 @@ public class MainActivity extends FragmentActivity
 
 	public void cmdConnectClicked(View view)
 	{
-		if (!btRobot.isConnected())
-		{
-			btRobot.setBTAddress(String.format("%s.%s.%s.%s", getResources().getStringArray(R.array.bluetooth_address)[0]
-					, getResources().getStringArray(R.array.bluetooth_address)[1]
-					, getResources().getStringArray(R.array.bluetooth_address)[2]
-					, getResources().getStringArray(R.array.bluetooth_address)[3]));
+		findViewById(R.id.cmdConnect).setEnabled(false);
+		((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(0);
+		findViewById(R.id.drawer_layout).setEnabled(false);
+		((TextView)findViewById(R.id.txtMessages)).setText("");
 
-			if (robotThread == null)
-			{
-				robotThread = new Thread(btRobot);
-				robotThread.start();
-			}
-			else
-			{
-				if (btRobot.isConnected())
-				{
-					btRobot.close();
-				}
-				robotThread = new Thread(btRobot);
-				robotThread.start();
-			}
+		if (btRobot.connectionStatus() == BluetoothRobot.ConnectStatus.DISCONNECTED)
+		{
+			btRobot.setBTAddress(String.format("%d.%d.%d.%d", prefs.getInt("BT1", 10)
+					, prefs.getInt("BT2", 0)
+					, prefs.getInt("BT3", 1)
+					, prefs.getInt("BT4", 1)));
+			robotThread = new Thread(btRobot);
+			robotThread.start();
+			connectHandle.post(connectUpdate);
 		}
 		else
 		{
 			btRobot.disconnect();
+			disconnectHandle.post(disconnectUpdate);
 		}
-		findViewById(R.id.cmdConnect).setEnabled(false);
-		((ProgressBar)findViewById(R.id.pgbStatus)).setProgress(0);
-		findViewById(R.id.drawer_layout).setEnabled(false);
-		connectHandle.post(connectUpdate);
+
+
 	}
 
     @Override
@@ -184,9 +202,9 @@ public class MainActivity extends FragmentActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 		btRobot = new BluetoothRobot();
-
 		connectHandle = new Handler();
 		dataHandle = new Handler();
+		disconnectHandle = new Handler();
         viewCreated = true;
         onNavigationDrawerItemSelected(0);
         mNavigationDrawerFragment = (NavigationDrawerFragment)
@@ -198,14 +216,22 @@ public class MainActivity extends FragmentActivity
 				R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
 
-
+		prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
 
 		if (savedInstanceState != null)
 		{
 			onNavigationDrawerItemSelected(savedInstanceState.getInt("curPos"));
 		}
 
-		rEvents = new RuleEvents((LinearLayout)findViewById(R.id.rules), btRobot.getAllRules());
+		rEvents = new EventManager((LinearLayout)findViewById(R.id.rules), btRobot.getAllRules());
+
+
+		((TextView) findViewById(R.id.txtBT1)).addTextChangedListener(rEvents.new txtBTTextChanged(R.id.txtBT1, prefs));
+		((TextView) findViewById(R.id.txtBT2)).addTextChangedListener(rEvents.new txtBTTextChanged(R.id.txtBT2, prefs));
+		((TextView) findViewById(R.id.txtBT3)).addTextChangedListener(rEvents.new txtBTTextChanged(R.id.txtBT3, prefs));
+		((TextView) findViewById(R.id.txtBT4)).addTextChangedListener(rEvents.new txtBTTextChanged(R.id.txtBT4, prefs));
+
+		rEvents = new EventManager((LinearLayout)findViewById(R.id.rules), btRobot.getAllRules());
 		((Spinner)findViewById(R.id.cboRule)).setOnItemSelectedListener(rEvents.new ruleChanged());
 		((Switch)findViewById(R.id.swtRule)).setOnCheckedChangeListener(rEvents.new swtChanged());
 		((Spinner)findViewById(R.id.cboObstacle)).setOnItemSelectedListener(rEvents.new obstacleChange());
@@ -213,20 +239,6 @@ public class MainActivity extends FragmentActivity
 		((Spinner)findViewById(R.id.cboAction2)).setOnItemSelectedListener(rEvents.new actionChanged());
 		((Spinner)findViewById(R.id.cboAction3)).setOnItemSelectedListener(rEvents.new actionChanged());
 
-
-		((ListView)findViewById(R.id.lstActions)).setOnDragListener(new ActionDragListener());
-		((Button)findViewById(R.id.cmdAFor_A_Bit)).setOnLongClickListener(new View.OnLongClickListener()
-		{
-			@Override
-			public boolean onLongClick(View view)
-			{
-				ClipData clipData = ClipData.newPlainText("Action", "FAB");
-				View.DragShadowBuilder shadow = new ButtonShadow(((Button) findViewById(R.id.cmdAFor_A_Bit)));
-
-				view.startDrag(clipData, shadow, BluetoothRobot.RobotActions.FORWARD_A_BIT, 0);
-				return true;
-			}
-		});
     }
 
 	@Override
@@ -247,7 +259,6 @@ public class MainActivity extends FragmentActivity
 
 
 			findViewById(R.id.rover).setVisibility(LayoutManager.getVisibility(position, R.id.rover)); //Ignore resource type so can return enum (int) for visibility
-			findViewById(R.id.action).setVisibility(LayoutManager.getVisibility(position, R.id.action));
 			findViewById(R.id.rules).setVisibility(LayoutManager.getVisibility(position, R.id.rules));
 			findViewById(R.id.settings).setVisibility(LayoutManager.getVisibility(position, R.id.settings));
 
@@ -261,9 +272,9 @@ public class MainActivity extends FragmentActivity
 					dataHandle.postDelayed(dataUpdate, 100);
 					LayoutManager.setUpRulesView(((LinearLayout)findViewById(R.id.rules)), btRobot.getAllRules());
 					break;
-                case 3:
+                case 2:
                     LayoutManager.setUpSettingsView((LinearLayout) findViewById(R.id.settings),
-                            btRobot.isConnected(), getResources());
+                            btRobot.connectionStatus() == BluetoothRobot.ConnectStatus.CONNECTED, getResources(), prefs);
             }
         }
 

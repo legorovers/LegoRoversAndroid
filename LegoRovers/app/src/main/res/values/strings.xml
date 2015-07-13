@@ -9,7 +9,6 @@
     <string-array name="menu_options">
         <item>Manual Navigation</item>
         <item>Rules</item>
-        <item>Actions</item>
         <item>Settings</item>
     </string-array>
 
@@ -18,13 +17,6 @@
     including internet access.</string>
 
     <string name="bluetooth">Bluetooth</string>
-
-    <string-array name="bluetooth_address">
-        <item>10</item>
-        <item>0</item>
-        <item>1</item>
-        <item>1</item>
-    </string-array>
 
     <string-array name="robot_ports">
         <item>S1</item>

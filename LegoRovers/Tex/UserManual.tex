@@ -1,5 +1,7 @@
 \documentclass[]{article}   	% use "amsart" instead of "article" for AMSLaTeX format
 \usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\graphicspath{{./Pictures/}}
 
 \title{Android Lego Rovers\\User Manual}		
 \date{}			
@@ -24,16 +26,36 @@
 
 \par{To ensure that the connection does take place the WiFi and mobile internet must be switched off.}
 
+\clearpage
 \subsection{Bluetooth Pairing}
 \par{The first step is to get the android tablet to pair with the EV3 robot. To achieve this :
 \begin{enumerate}
-	\item Turn on the EV3 robot by pressing the dark grey button in the middle
-	\item Wait for the EV3 to finish starting up, it will make a beep when it ready. (This will take a while)
-	\item Go into the settings app on your device
-	\item Turn on bluetooth
-	\item Touch the name of the robot when it appears.
-	\item Touch the gear icon next to the robot name
-	\item Touch the box so that the internet enabled box is ticked
+	\item Turn on the EV3 robot by pressing the dark grey button in the middle\\
+		\begin{center}
+			\includegraphics[scale=0.2]{graybtn.JPG}
+		\end{center}		
+	\item Wait for the EV3 to finish starting up, it will make a beep when it is ready. (This will take a while)
+	\item Go into the settings app on your device\\
+		\begin{center}
+			\includegraphics[scale=0.4]{settingapp.png}
+		\end{center}			
+	\item Turn on bluetooth	\\
+		\begin{center}
+			\includegraphics[scale=0.45]{btswitch.png}
+		\end{center}			
+	\item Touch the name of the robot when it appears.\\
+		\begin{center}
+			\includegraphics[scale=0.4]{btada.png}
+		\end{center}			
+	\item Touch the gear icon next to the robot name\\
+		\begin{center}
+			\includegraphics[scale=0.4]{btset.png}
+		\end{center}		
+\clearpage	
+	\item Touch the box so that the internet enabled box is ticked\\
+		\begin{center}
+			\includegraphics[scale=0.4]{btinternet.png}
+		\end{center}		
 	\item The pairing is now complete
 	\item Make sure mobile data and WiFi is switched off
 \end{enumerate}
@@ -42,9 +64,19 @@
 \subsection{Connecting}
 \par{After you have paired the device and the EV3 robot, you will need to connect the app to the EV3 robot to do this:
 \begin{enumerate}
-	\item Start the Lego Rovers app
-	\item Go to settings with the Lego Rovers app
-	\item Press the connect button
+	\item Start the Lego Rovers app\\
+		\begin{center}
+			\includegraphics[scale=0.4]{apps.png}
+		\end{center}		
+\clearpage
+	\item Go to settings with the Lego Rovers app\\
+		\begin{center}
+			\includegraphics[scale=0.4]{navset.png}
+		\end{center}		
+	\item Press the connect button\\
+		\begin{center}
+			\includegraphics[scale=0.5]{connect.png}
+		\end{center}		
 	\item Wait for the connected message to appear beneath the button. 
 \end{enumerate}
 
@@ -55,8 +87,13 @@
 
 \section{App Usage}
 \subsection{Navigating Screens}
-\par{To select a screen to use first touch the menu item on the top left of the screen. A list of pages will appear, touch the page name to go to that page}
+\par{To select a screen to use first touch the menu item on the top left of the screen. A list of pages will appear, touch the page name to go to that page	}
 \subsection{Manual Control}
+\par{
+\begin{center}
+	\includegraphics[scale=0.3]{navpane.png}
+\end{center}			
+}
 \par{This screen has a number of buttons that can be pressed to control the robot, when connected the buttons do the following: 
 \begin{description}
 	\item[Double Up Arrow] Make the robot move forward until stop is pressed
@@ -73,6 +110,11 @@
 }
 
 \subsection{Rules}
+\par{
+\begin{center}
+	\includegraphics[scale=0.45]{rules.png}
+\end{center}			
+}
 \par{The rules section allows you to create rules that the robot will do, when either faced with an object or an object has disappeared. This is split into two sections with the top being the current values of the sensors and the bottom being where you can create and edit the rules of the robot.}
 \par{The top section consists of the following:
 \begin{description}
@@ -91,6 +133,11 @@
 }
 
 \subsection{Settings}
+\par{
+\begin{center}
+	\includegraphics[scale=0.4]{settings.png}
+\end{center}			
+}
 \par{This page is for connecting and disconnecting the application from the robot, you can also change the detection settings for the water, path and obstacle detection.}
 
 \par{The detection settings at the top consist of:
@@ -100,12 +147,14 @@
 	\item[Path Value] This is when the robot detects black beneath the light sensor indicating a path. The path is detected between the values of 0 to the value specified. The default is 0.06.
 \end{description}
 }
-
+\clearpage
 \par{The robot connection settings consist of:
 \begin{description}
-	\item[Robot Address]This is the address of the robot to be connected to, the value can be found on the robot when it is turned on. The default value is 10.0.1.1.
-	\item[Connect/Disconnect] 
-	\par{This button connects and disconnects the robot depending if there is a connection. The connection and disconnection process takes a few moments and when the process is happening it is described in the box below the button.}
+	\item[Robot Address]This is the address of the robot to be connected to, the value can be found on the robot when it is turned on. The default value is 10.0.1.1.\\
+		\begin{center}
+			\includegraphics[scale=0.2]{address.JPG}
+		\end{center}		
+	\item[Connect/Disconnect] This button connects and disconnects the robot depending if there is a connection. The connection and disconnection process takes a few moments and when the process is happening it is described in the box below the button.
 	\par{When using the app be sure to turn off WiFi and mobile data, as this does cause the app to be unable to connect to the robot.}
 \end{description}
 }
